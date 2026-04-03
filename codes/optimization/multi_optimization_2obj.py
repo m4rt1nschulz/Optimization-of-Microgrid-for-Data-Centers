@@ -4,14 +4,17 @@ from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
 from pymoo.algorithms.moo.nsga2 import NSGA2
 import vessim as vs
-from CustomBatteries import BoundedSimpleBattery
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from codes.CustomBatteries import BoundedSimpleBattery
 import time
 import matplotlib.pyplot as plt
 
 # 1. Load Data
 # For this to run, the CSV must contain columns named: 
 # 'Price_EUR_MWh', 'CO2_Intensity_g_kWh', 'Wind_Power_1kW', and 'Solar_Power_1kW'.
-data = pd.read_csv("vessim_unified_data_2022.csv", parse_dates=['Datetime'], index_col='Datetime')
+data = pd.read_csv("data\\unified_data\\vessim_unified_data_gif_2022.csv", parse_dates=['Datetime'], index_col='Datetime')
 data.columns = ['Price_EUR_MWh', 'CO2_Intensity_g_kWh', 'Consommation', 'Solar_Power_1kW', 'Wind_Power_1kW']
 
 class SystemSizingProblem(ElementwiseProblem):
@@ -120,10 +123,10 @@ class SystemSizingProblem(ElementwiseProblem):
         # Convert total grams to kilograms for the year
         opex_co2_kg = total_co2_emitted / 1000
         
-        # OBJECTIVE 2: Embedded Emissions (CAPEX CO2)
-        capex_wind = wind_size * 200       # 200 kg CO2 per kW for wind turbines
-        capex_solar = solar_size * 600   # 600 kg CO2 per kWp
-        capex_battery = bat_cap * 100    # 100 kg CO2 per kWh
+        # OBJECTIVE 2: Embedded Emissions (CAPEX CO2 annualized for the lifetime of the assets)
+        capex_wind = wind_size * 200 /20      # 200 kg CO2 per kW for wind turbines
+        capex_solar = solar_size * 600  /20 # 600 kg CO2 per kWp
+        capex_battery = bat_cap * 100 / 5   # 100 kg CO2 per kWh
         capex_co2_kg = capex_wind + capex_solar + capex_battery
         
         # Pass both objectives to PyMoo (Minimize both)
@@ -167,8 +170,8 @@ if __name__ == "__main__":
         plt.scatter(capex_tonnes, opex_tonnes, color='blue', edgecolors='black', s=50)
         plt.plot(capex_tonnes, opex_tonnes, color='gray', linestyle='--', alpha=0.5)
         plt.title("Pareto Front: Embedded vs. Operational Carbon Emissions")
-        plt.xlabel("Embedded Emissions / CAPEX (kg CO2)")
-        plt.ylabel("Yearly Operational Emissions / OPEX (kg CO2)")
+        plt.xlabel("Embedded Emissions / CAPEX (Tonnes CO2)")
+        plt.ylabel("Yearly Operational Emissions / OPEX (Tonnes CO2)")
         plt.grid(True, linestyle=':', alpha=0.7)
         plt.tight_layout()
         plt.show()
