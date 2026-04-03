@@ -8,12 +8,12 @@ def main():
     print(f"Starting processing for the unified {year} dataset...\n")
 
     # 1. Define Paths
-    price_file = f'codes-martin/data/ember-energy/uk_energy_prices.csv'     
-    co2_file = f'codes-martin/data/NESO/uk_generation_mix_and_emissions.csv'
+    price_file = f'data\ember-energy_prices\uk_energy_prices.csv'     
+    co2_file = f'data\NESO_uk_emissions\uk_generation_mix_and_emissions.csv'
     
     # Paths for your local solar and wind data
-    solar_file = 'codes-martin/data/vessim_solar_london.csv'
-    wind_file = 'codes-martin/data/vessim_wind_london.csv'
+    solar_file = 'data\vessim_results\vessim_solar_london.csv'
+    wind_file = 'data\vessim_results\vessim_wind_london.csv'
 
     # Safety check
     if not (os.path.exists(price_file) and os.path.exists(co2_file)):

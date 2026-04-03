@@ -4,21 +4,22 @@ from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
 from pymoo.algorithms.moo.nsga2 import NSGA2
 import vessim as vs
-from CustomBatteries import BoundedSimpleBattery
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from codes.CustomBatteries import BoundedSimpleBattery
 import time
 import matplotlib.pyplot as plt
 import rainflow
 
-###########
-#########
-## ====================== CHANGE TO FRANCE =================
-##########
-#########
+# SIMULATION PARAMETERS (EDIT HERE):
+POP_SIZE = 50
+N_GEN = 30
 
 # 1. Load Data
 # For this to run, the CSV must contain columns named: 
 # 'Price_EUR_MWh', 'CO2_Intensity_g_kWh', 'Wind_Power_1kW', and 'Solar_Power_1kW'.
-data = pd.read_csv("vessim_unified_data_london_2022.csv", parse_dates=['Datetime'], index_col='Datetime')
+data = pd.read_csv("data\\unified_data\\vessim_unified_data_gif_2022.csv", parse_dates=['Datetime'], index_col='Datetime')
 data.columns = ['Price_EUR_MWh', 'CO2_Intensity_g_kWh', 'Consommation', 'Solar_Power_1kW', 'Wind_Power_1kW']
 
 class SystemSizingProblem(ElementwiseProblem):
@@ -198,8 +199,8 @@ if __name__ == "__main__":
     
     # We use a very small population and generation size for initial testing
     # Increase these to 20/50 when you are ready for the final run
-    algorithm = NSGA2(pop_size=1)
-    res = minimize(problem, algorithm, ('n_gen', 1), verbose=True)
+    algorithm = NSGA2(pop_size=POP_SIZE)
+    res = minimize(problem, algorithm, ('n_gen', N_GEN), verbose=True)
 
     print("\n--- PARETO FRONT FOUND ---")
     
@@ -228,7 +229,7 @@ if __name__ == "__main__":
                         s=80, edgecolors='black', alpha=0.9, zorder=5)
         ax.set_xlabel('Embedded Emissions / CAPEX (Tonnes CO2)', fontsize=16)
         ax.set_ylabel('Yearly Operational Emissions / OPEX (Tonnes CO2)', fontsize=16)
-        ax.set_title('Pareto Front (London, UK): Carbon Trade-offs vs. Total Annual Cost', fontsize=16, fontweight='bold')
+        ax.set_title('Pareto Front: Carbon Trade-offs vs. Total Annual Cost', fontsize=16, fontweight='bold')
         # Add the color bar on the side
         cbar = plt.colorbar(sc)
         cbar.set_label('Yearly Total Cost (M€)', fontsize=16)
@@ -248,7 +249,7 @@ if __name__ == "__main__":
             plt.figure(figsize=(10, 6))
             # Create a weighted histogram showing how many times the battery hit a specific DoD
             plt.hist(depths, weights=counts, bins=20, color='teal', edgecolor='black', alpha=0.7)
-            plt.title(f"Battery Cycle Depth (London, UK) - Most Cost-Effective System\nWind: {best_x[0]:.0f}kW | Solar: {best_x[1]:.0f}kW | Bat: {best_x[2]:.0f}kWh", fontweight='bold')
+            plt.title(f"Battery Cycle Depth - Most Cost-Effective System\nWind: {best_x[0]:.0f}kW | Solar: {best_x[1]:.0f}kW | Bat: {best_x[2]:.0f}kWh", fontweight='bold')
             plt.xlabel("Cycle Depth (Depth of Discharge %)")
             plt.ylabel("Number of Cycles per Year")
             plt.grid(axis='y', alpha=0.6, linestyle='--')

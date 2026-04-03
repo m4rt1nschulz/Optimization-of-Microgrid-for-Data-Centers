@@ -4,7 +4,10 @@ from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
 from pymoo.algorithms.moo.nsga2 import NSGA2
 import vessim as vs
-from CustomBatteries import BoundedSimpleBattery
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from codes.CustomBatteries import BoundedSimpleBattery
 import time
 import matplotlib.pyplot as plt
 import rainflow

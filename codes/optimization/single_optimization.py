@@ -4,13 +4,20 @@ from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
 from pymoo.algorithms.moo.nsga2 import NSGA2
 import vessim as vs
-from CustomBatteries import BoundedSimpleBattery
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from codes.CustomBatteries import BoundedSimpleBattery
 import time
+
+# SIMULATION PARAMETERS (EDIT HERE):
+POP_SIZE = 50
+N_GEN = 30
 
 # 1. Load Data
 # For this to run, the CSV must contain columns named: 
 # 'Price_EUR_MWh', 'CO2_Intensity_g_kWh', 'Wind_Power_1kW', and 'Solar_Power_1kW'.
-data = pd.read_csv("vessim_unified_data_2022.csv", parse_dates=['Datetime'], index_col='Datetime')
+data = pd.read_csv("data\\unified_data\\vessim_unified_data_gif_2022.csv", parse_dates=['Datetime'], index_col='Datetime')
 data.columns = ['Price_EUR_MWh', 'CO2_Intensity_g_kWh', 'Consommation', 'Solar_Power_1kW', 'Wind_Power_1kW']
 
 class SystemSizingProblem(ElementwiseProblem):
@@ -120,7 +127,7 @@ class SystemSizingProblem(ElementwiseProblem):
         
         # End tracker and print results for this evaluation
         exec_time = time.time() - start_time
-        print(f"\n🟢 Sim {self.eval_count} Done!")
+        print(f"\n Sim {self.eval_count} Done!")
         print(f"   Tested: Wind={wind_size:.1f}kW | Solar={solar_size:.0f}kWp | Battery={bat_cap:.0f}kWh")
         print(f"   Result: Cost=€{total_cost:,.2f} | Average CO2={avg_co2:.1f}g/kWh | Time={exec_time:.1f}s")
 
@@ -131,8 +138,8 @@ if __name__ == "__main__":
     
     # We use a very small population and generation size for initial testing
     # Increase these to 20/50 when you are ready for the final run
-    algorithm = NSGA2(pop_size=5)
-    res = minimize(problem, algorithm, ('n_gen', 5), verbose=True)
+    algorithm = NSGA2(pop_size=POP_SIZE)
+    res = minimize(problem, algorithm, ('n_gen', N_GEN), verbose=True)
 
     print("\n--- OPTIMIZATION COMPLETE ---")
     
@@ -143,6 +150,6 @@ if __name__ == "__main__":
         print(f"  Battery Size:  {res.X[2]:.0f} kWh")
         print(f"  Total Yearly Cost: €{res.F[0]:,.2f}")
     else:
-        print("❌ No valid configuration found!")
+        print("No valid configuration found!")
         print("Every hardware combination tested violated the CO2 constraint (< 72g).")
         print("The battery might be too small to survive long periods of high grid CO2.")

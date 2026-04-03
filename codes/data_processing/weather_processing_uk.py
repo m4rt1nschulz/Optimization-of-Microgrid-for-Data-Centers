@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def main():
     # Point to the weather file from the NREL TMY dataset 
-    weather_file = "codes-martin\data\london_weather_tmy-2022.csv"
+    weather_file = "data\weather_tmy\london_weather_tmy-2022.csv"
     # Create a date range for the entire year (8760 hours)
     dates = pd.date_range(start="2022-01-01 00:00", periods=8760, freq="h")
 
@@ -32,7 +32,7 @@ def main():
     # We apply the Hellmann Wind Profile Power Law (alpha = 0.143 for onshore)
     df_nrel['Wind Speed 80m'] = df_nrel['Wind Speed'] * ((80.0 / 10.0) ** 0.143)
     # Prepare the .srw file for PySAM Windpower
-    wind_ready_file = "vessim_wind_input.srw"
+    wind_ready_file = "data\weather_tmy\vessim_wind_input.srw"
     # Write the file manually to ensure correct formatting
     with open(wind_ready_file, 'w', newline='\n') as f:
         # Row 1: Metadata (Location ID, City, State, Country, Year, Lat, Lon, Elev)

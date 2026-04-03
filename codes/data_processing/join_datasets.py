@@ -26,13 +26,13 @@ def main():
     print(f"Starting processing for the unified {year} dataset...\n")
 
     # 1. Define Paths
-    price_file = f'codes-martin/data/energy-charts/energy-charts_Electricity_production_and_spot_prices_in_France_in_{year}.xlsx'     
-    idf_file = f'codes-martin/data/eCO2_idf/eCO2mix_RTE_Ile-de-France_Annuel-Definitif_{year}.xls'
-    fr_file = f'codes-martin/data/eCO2_france/eCO2mix_RTE_Annuel-Definitif_{year}.xls'
+    price_file = f'data\energy-charts_fr_prices\energy-charts_Electricity_production_and_spot_prices_in_France_in_{year}.xlsx'     
+    idf_file = f'data\eCO2_idf\eCO2mix_RTE_Ile-de-France_Annuel-Definitif_{year}.xls'|
+    fr_file = f'data\eCO2_france\eCO2mix_RTE_Annuel-Definitif_{year}.xls'
     
     # Paths for your local solar and wind data
-    solar_file = 'codes-martin/data/vessim_solar_gif.csv'
-    wind_file = 'codes-martin/data/vessim_wind_gif.csv'
+    solar_file = 'data\vessim_results\vessim_solar_gif.csv'
+    wind_file = 'data\vessim_results\vessim_wind_gif.csv'
 
     # Safety check
     if not (os.path.exists(price_file) and os.path.exists(idf_file) and os.path.exists(fr_file)):
@@ -118,7 +118,7 @@ def main():
     master_df = df_base.join(df_solar, how='inner').join(df_wind, how='inner')
     
     # 8. Output
-    output_name = f'vessim_unified_data_{year}.csv'
+    output_name = f'vessim_unified_data_gif_{year}.csv'
     master_df.reset_index(inplace=True)
     master_df.to_csv(output_name, index=False)
     
